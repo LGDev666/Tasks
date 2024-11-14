@@ -1,211 +1,96 @@
-
-import { View, Text, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity, Pressable } from "react-native";
-import { FaAngleDown,FaCheck } from "react-icons/fa6";
-import { Ionicons } from '@expo/vector-icons'; 
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity } from "react-native";
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; 
 import moment from "moment";
 import { useEffect, useState } from "react";
 import CommomStyles from "../CommomStyles";
 import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
 
-import { FontAwesome5, Entypo } from '@expo/vector-icons'; 
-import AsyncStorage from "@react-native-async-storage/async-storage";
+export default (props) => {
+    const { task, itemClickCallback, onDelete, onEdit } = props; // Agora temos onEdit
+    const [done, setDone] = useState(task.done);
 
+    const doneOrNotStyle = task.done ? { textDecorationLine: 'line-through', color: 'red' } : null;
+    const date = task.doneAt || task.estimateAt;
+    const formattedDate = moment(date).locale('pt-br').format('ddd, D [de] MMM, [às] h:mm a');
 
-export default props => {
+    const click = () => {
+        itemClickCallback(task);
+    };
 
-    const {task, itemClickCallback, onDelete} = props //ele recebe aqui agora
-    const [done, setDone] = useState(task.done)
+    // Função para excluir a tarefa
+    const handleDelete = () => {
+        onDelete(task.id); // Passa o id da tarefa para a função de exclusão
+    };
 
-    const doneOrNotStyle = task.done ? {textDecorationLine: 'line-through', color:'red'} : null
-    const date = task.doneAt || task.estimateAt
-    const formattedDate = moment(date).locale('pt-br').format('ddd, D [de] MMM, [às] h:mm a')
+    // Função para editar a tarefa
+    const handleEdit = () => {
+        onEdit(task); // Chama a função para editar a tarefa
+    };
 
-    console.log('redraw do filho');
+    useEffect(() => {
+        task.done = done;
+        task.doneAt = task.done ? new Date() : null; // atualizando doneAt
+    }, [done]);
 
-    
-    const tasks = localStorage.getItem('tasks')
-    //console.log(JSON.parse(tasks));
-    
-    const click = () =>{
-        //agora o children nao faz nada quando clickado, apenas avisa o parent que vc clickou  com o callback q o proprio parent passou...
-      
-        itemClickCallback(task) //nao  faz sentido, retorna soh a task que o  cara clikou pra q a lista toda?
-        
-    }
-
-    //executa esse bloco quando 'done' mudar
-    useEffect(_=>{
-        task.done = done 
-        task.doneAt = task.done ? new Date() : null//atualiznado doneAt
-    }, [done]) 
-
-    const id = task.id
-    console.log(id)
-    
-    return(
+    return (
         <GestureHandlerRootView>
-        <Swipeable 
-            renderRightActions={() => {
-                return(
-                    <TouchableOpacity style={styles.right} onPress={() => props.onDelete && props.onDelete(id)}>
-                        <FontAwesome5 name="trash" size={30} color="white" />
-                    </TouchableOpacity>
-                )
-            }} 
-            renderLeftActions={() => {
-                return(
-                    <View style={styles.left}>
-                        <FontAwesome5 name="trash" size={20} color="white" style={styles.excludeIcon}/>
-                        <Text style={styles.excludeText}>Excluir</Text>
-                    </View>
-                )
-            }}
-            onSwipeableOpen={(direction) => {
-           
-                if(direction === 'left' ){
-                    props.onDelete && props.onDelete(id)
-                    
-                }
-         }}
-        >
-            <View style={styles.container}>
-                <TouchableWithoutFeedback onPress={() =>click()}>
-                    <View style={styles.checkcontainer}>
-                        <View style={ task.done ?  styles.done : styles.pending}>
-                            <Ionicons name={task.done ? "ios-checkmark-circle" : null} size={28} color="green" style={{paddingLeft: 2}}/>
+            <Swipeable 
+                renderRightActions={() => {
+                    return (
+                        <TouchableOpacity style={styles.right} onPress={handleDelete}> {/* Muda a ação para exclusão */}
+                            <FontAwesome5 name="trash" size={30} color="white" /> {/* Troca para ícone de exclusão */}
+                        </TouchableOpacity>
+                    );
+                }}
+            >
+                <TouchableOpacity onPress={handleEdit}> {/* Muda o comportamento do onPress para editar */}
+                    <View style={styles.container}>
+                        <TouchableWithoutFeedback onPress={click}>
+                            <View style={styles.checkcontainer}>
+                                <Ionicons name={done ? 'checkbox' : 'square-outline'} size={25} color={CommomStyles.colors.today} />
+                            </View>
+                        </TouchableWithoutFeedback>
+                        <View style={styles.desccontainer}>
+                            <Text style={[styles.desc, doneOrNotStyle]}>{task.desc}</Text>
+                            <Text style={[styles.date, doneOrNotStyle]}>{formattedDate}</Text>
                         </View>
-
                     </View>
-                </TouchableWithoutFeedback>
-                <View>
-                    <Text style={[styles.desc, doneOrNotStyle]}>{task.desc} - </Text>
-                    <Text style={[styles.date]}>{doneOrNotStyle != null ? 'Tarefa concluída em ' + formattedDate : 'Tarefa agendada em ' + formattedDate}</Text>
-                </View>
-
-            </View>
-        </Swipeable>
+                </TouchableOpacity>
+            </Swipeable>
         </GestureHandlerRootView>
-    )
-
-
-
-}
-
-
-
+    );
+};
 
 const styles = StyleSheet.create({
-
-    container: {
-      flexDirection: 'row',
-      borderColor: '#aaa',
-      borderBottomWidth: 1,
-      alignItems: 'center',
-      paddingVertical: 10,
-      backgroundColor: '#fff'
-    },
-    checkcontainer:{
-        width: '20%',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    pending:{
-        height: 25,
-        width: 25,
-        borderRadius: 13,
-        borderWidth: 2,
-        borderColor: '#555',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 'large',
-        color: 'white',
-
-    },
-    done: {
-
-        borderRadius: 100,
-
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 'large',
-        color: 'white',
-        // fontWeight: 600
-    },
-    desc:{
-        fontFamily: CommomStyles.fontFamily,
-        color: CommomStyles.colors.mainText,
-        fontSize: 15,
-    },
-    date:{
-        fontFamily: CommomStyles.fontFamily,
-        color: CommomStyles.colors.subText,
-        fontSize: 12,
-        marginTop: 2,
-    },
-    right:{
-        backgroundColor: 'red',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        paddingHorizontal: 20,
-    },
-    left:{
-        backgroundColor: 'red',
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-    },
-    excludeText:{
-        fontFamily: CommomStyles.fontFamily,
-        color: '#fff',
-        fontSize: 20,
-        margin: 10,
-    },
-    excludeIcon:{
-        marginLeft: 10,
-    },
+  container: { 
+    flexDirection: 'row', 
+    padding: 10, 
+    alignItems: 'center', // Centraliza todos os itens verticalmente
+    justifyContent: 'center', // Garante que todos os itens estejam centralizados horizontalmente
+    borderBottomWidth: 1, // Adiciona uma linha inferior
+    borderBottomColor: CommomStyles.colors.today, // Cor da linha igual à da checkbox
+  },
+  checkcontainer: { 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  desccontainer: { 
+    flex: 1, 
+    justifyContent: 'center', // Centraliza o conteúdo verticalmente
+    alignItems: 'center' // Centraliza o conteúdo horizontalmente
+  },
+  desc: { 
+    fontSize: 18, 
+    textAlign: 'center' // Garante que o texto da descrição fique centralizado
+  },
+  date: { 
+    fontSize: 16, 
+    color: CommomStyles.colors.subText, 
+    textAlign: 'center' // Centraliza o texto da data
+  },
+  right: { 
+    backgroundColor: 'red', 
+    justifyContent: 'center', 
+    padding: 20 
+  },
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
