@@ -39,10 +39,13 @@ export default function App() {
   };
 
   const showDoneTasksHandler = _ => setShowDoneTasks(!showDoneTasks);
-
-  const itemClickCallback = item => {
-    item.done = !item.done;
-    setTasks([...tasks]);
+//toggledone ao inves de itemcallback melhorar funcionalidade
+ const toggleDone = taskId => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, done: !task.done } : task
+    );
+    setTasks(updatedTasks);
+    AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
   const deleteTask = id => {
@@ -98,8 +101,9 @@ export default function App() {
       <View style={styles.tasklist}>
         {tasks.map((task, index) => (
           showDoneTasks 
-            ? (task.done && <Task key={index} task={task} itemClickCallback={itemClickCallback} onDelete={deleteTask} onEdit={onEdit} />)
-            : (!task.done && <Task key={index} task={task} itemClickCallback={itemClickCallback} onDelete={deleteTask} onEdit={onEdit} />)
+          
+            ? (task.done && <Task key={index} task={task} toggleDone={toggleDone} onDelete={deleteTask} onEdit={onEdit} />)
+            : (!task.done && <Task key={index} task={task} toggleDone={toggleDone} onDelete={deleteTask} onEdit={onEdit} />)
         ))}
       </View>
 
