@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     editButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#0000ff',
         justifyContent: 'center',
         alignItems: 'center',
         width: 75,
