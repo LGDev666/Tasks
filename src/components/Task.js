@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback } fr
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import CommomStyles from '../CommomStyles';
+
 const Task = ({ task, onEdit, onDelete, done, toggleDone }) => {
     useEffect(() => {
         task.done = done;
@@ -35,55 +36,57 @@ const Task = ({ task, onEdit, onDelete, done, toggleDone }) => {
                         <Text style={[styles.desc, done ? styles.done : null]}>{task.desc}</Text>
                         <Text style={[styles.date, done ? styles.done : null]}>{task.estimateAt}</Text>
                     </View>
-                        </View>
-                    </View>
+                </View>
             </Swipeable>
         </GestureHandlerRootView>
     );
 };
 
 const styles = StyleSheet.create({
-      container: {
+    container: {
         flexDirection: 'row',
         borderBottomWidth: 1,
         borderColor: '#AAA',
-        alignItems: 'center',
         paddingVertical: 10,
-        backgroundColor: '#FFF'
-    },
-    checkcontainer: {
-        width: '10%',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    desccontainer: {
-        width: '70%'
-    },
-    desc: {
-        fontSize: 15
-    },
-    date: {
-        fontSize: 12
+        paddingHorizontal: 15,
+        backgroundColor: '#FFF',
     },
     rightActions: {
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     editButton: {
-        backgroundColor: 'blue',
+        backgroundColor: '#4CAF50',
         justifyContent: 'center',
         alignItems: 'center',
-        width: 80,
-        height: '100%'
+        width: 75,
     },
     deleteButton: {
-        backgroundColor: 'red',
+        backgroundColor: '#F44336',
         justifyContent: 'center',
         alignItems: 'center',
-        width: 80,
-        height: '100%'
+        width: 75,
+    },
+    checkcontainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 50,
+    },
+    desccontainer: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    desc: {
+        fontSize: 15,
+        color: '#333',
     },
     done: {
-        textDecorationLine: 'line-through'
-    }
+        textDecorationLine: 'line-through',
+        color: '#AAA',
+    },
+    date: {
+        fontSize: 12,
+        color: '#999',
+    },
 });
+
 export default Task;
