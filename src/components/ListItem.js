@@ -1,4 +1,4 @@
-
+// Importações de bibliotecas e dependências.
 import { View, Text, StyleSheet, FlatList, TouchableWithoutFeedback } from "react-native";
 import { FaAngleDown,FaCheck } from "react-icons/fa6";
 import moment from "moment";
@@ -6,18 +6,18 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 
 import CommomStyles from "../CommomStyles";
-
+// componente que representa um item de lista (tarefa)
 export default props => {
 
 
     const {task, callback} = props
-    const [done, setDone] = useState(task.done)
+    const [done, setDone] = useState(task.done) // Estado para indicar se a tarefa está concluida. 
 
     const doneOrNotStyle = done ? {textDecorationLine: 'line-through', color:'red', mod: true} : null
     const date = task.doneAt || task.estimateAt
     const formattedDate = moment(date).locale('pt-br').format('dddd, D [de] MMMM, [às] h:mm a')
 
-
+// Função chamada ao clicar na tarefa.
     const click = () =>{
         //aqui soh muda a 'view'
         setDone(!done)
